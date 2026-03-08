@@ -1,28 +1,55 @@
 ---
 name: openclaw_reference
-description: Reference OpenClaw source documentation for product usage, deployment, configuration, CLI commands, channels, gateway behavior, tools, and troubleshooting. Use when users ask how OpenClaw works, how to configure or operate it, where a feature is documented, or to verify behavior from docs before answering.
+description: Reference and refresh a local OpenClaw documentation snapshot for product usage, deployment, configuration, CLI commands, channels, gateway behavior, tools, troubleshooting, and docs-version verification. Use when users ask how OpenClaw works, how to configure or operate it, where a feature is documented, whether the local docs are outdated, or to update this skill's OpenClaw knowledge base from upstream docs.
+metadata:
+  short-description: Reference and refresh OpenClaw docs
 ---
 
 # OpenClaw Reference
 
-Use this skill to answer OpenClaw questions from local source docs in `openclaw_docs/`, not memory.
+Use this skill to answer OpenClaw questions from local source docs in `openclaw_docs/`, not memory, and to refresh that snapshot when the user explicitly asks for an update.
+
+The maintained compatibility target is the English docs snapshot. Locale-prefixed navigation entries in `docs.json` may exist, but validation only guarantees the English document set is usable.
 
 ## Files
 
 - `./openclaw_docs/`: markdown source docs
 - `./docs.json`: optional metadata/navigation mapping
+- `./state/source-lock.json`: current snapshot source, ref, commit, and sync metadata
+- `./state/docs-manifest.json`: generated manifest of the local docs snapshot
+- `./state/topic-index.json`: generated keyword-to-path topic index
+- `./state/latest-diff.md`: latest update diff summary
 - `./references/routing-cheatsheet.md`: intent-to-path quick router for broad questions
 - `./references/query-examples.md`: ready-to-use search query patterns by user intent
+- `./references/update-workflow.md`: refresh workflow for syncing and validating the local snapshot
+- `./scripts/`: deterministic sync, validate, build, and diff helpers
 
 ## Workflow
 
-1. Identify intent and route to likely subdirectories first.
+1. Determine whether the user wants documentation lookup or snapshot maintenance.
+   - For normal product questions, answer from the current local snapshot.
+   - For "latest", "refresh", "update docs", or "is this outdated?" requests, read `state/source-lock.json` first and use `references/update-workflow.md`.
+2. Identify intent and route to likely subdirectories first.
    - If intent is broad or mixed, read `references/routing-cheatsheet.md` first.
    - If wording is clear but query terms are weak, read `references/query-examples.md`.
-2. Search with fast text search (`rg`) under `openclaw_docs/`; avoid broad full-tree reads.
-3. Read full content of the top 1-3 most relevant files before answering.
-4. Synthesize a direct answer and include exact file paths used.
-5. If docs are ambiguous or missing, say so explicitly and state what was searched.
+3. Search with fast text search (`rg`) under `openclaw_docs/`; avoid broad full-tree reads.
+4. Read full content of the top 1-3 most relevant files before answering.
+5. Synthesize a direct answer and include exact file paths used.
+6. When freshness matters, report the current snapshot commit/date from `state/source-lock.json` and do not imply the snapshot is current unless it was just refreshed.
+7. If the user explicitly requests a refresh, run the scripted flow:
+   - `python scripts/sync_docs.py ...`
+   - `python scripts/validate_docs.py`
+   - `python scripts/build_knowledge.py`
+   - `python scripts/diff_docs.py`
+8. If docs are ambiguous or missing, say so explicitly and state what was searched.
+
+## Update Principles
+
+- Refresh this skill by reading upstream OpenClaw docs into the local snapshot only.
+- Allowed: local repo reads, `git fetch`, `git clone`, copying `docs/` and `docs.json` into this skill, and rebuilding local indexes.
+- Not allowed: `git push`, PR creation, uploading this skill folder, or sending local skill contents back to GitHub.
+- Treat upstream refs such as `main`, tags, or commits as read-only sources, not write targets.
+- Prefer a local OpenClaw checkout when available; otherwise clone/fetch the upstream repo without modifying any remote.
 
 ## Routing Hints
 
@@ -41,6 +68,7 @@ Use this skill to answer OpenClaw questions from local source docs in `openclaw_
 - Exclude merged or generated outputs when present.
 - For very large files, jump to relevant sections first, then expand for surrounding context.
 - Do not rely on a single snippet when explaining behavior, constraints, or defaults.
+- Prefer local snapshot sync over per-question remote browsing for repeatability.
 
 ## Answer Quality Bar
 
@@ -48,3 +76,4 @@ Use this skill to answer OpenClaw questions from local source docs in `openclaw_
 - Include paths in the response so users can verify quickly.
 - Separate documented behavior from inference.
 - Do not invent flags, defaults, commands, or config keys not found in docs.
+- For freshness-sensitive answers, include the snapshot version from `state/source-lock.json`.

@@ -2,3 +2,6 @@
 .vscode/
 node_modules/
 *.log
+__pycache__/
+scripts/__pycache__/
+openclaw_docs.previous/

@@ -1,58 +1,56 @@
 # OpenClaw Routing Cheatsheet
 
-Use this file when the user question is broad and you need a fast first route before full-text search.
+Generated from the current local snapshot. Use this file when the user question is broad and you need a fast first route before full-text search.
 
-## User Intent -> First Paths
+## Snapshot
 
-- Install, upgrade, uninstall, migration:
-  - `openclaw_docs/install/`
-  - `openclaw_docs/start/`
-  - `openclaw_docs/platforms/`
-- Product architecture, runtime behavior, model/session concepts:
-  - `openclaw_docs/concepts/`
-  - `openclaw_docs/gateway/`
-- CLI command usage:
-  - `openclaw_docs/cli/`
-- Tool behavior and permissions:
-  - `openclaw_docs/tools/`
-  - `openclaw_docs/gateway/sandboxing.md`
-  - `openclaw_docs/gateway/sandbox-vs-tool-policy-vs-elevated.md`
-- Channel integrations (Telegram, Slack, Discord, etc.):
-  - `openclaw_docs/channels/`
-- Model providers and API backends:
-  - `openclaw_docs/providers/`
-- Nodes/plugins and extensions:
-  - `openclaw_docs/nodes/`
-  - `openclaw_docs/plugins/`
-- Troubleshooting and diagnostics:
-  - `openclaw_docs/help/`
-  - `openclaw_docs/diagnostics/`
-  - `openclaw_docs/gateway/troubleshooting.md`
-  - `openclaw_docs/channels/troubleshooting.md`
-- Security, threat model, auth hardening:
-  - `openclaw_docs/security/`
-  - `openclaw_docs/gateway/security/`
-  - `openclaw_docs/gateway/authentication.md`
-  - `openclaw_docs/gateway/trusted-proxy-auth.md`
-- Experimental design/proposals:
-  - `openclaw_docs/experiments/`
+- Generated at: `2026-03-08T18:49:41.684417+00:00`
+- Markdown files indexed: `664`
+
+## Top-Level Routes
+
+- `.i18n/` (1 files)
+- `_root/` (13 files)
+- `automation/` (8 files)
+- `channels/` (29 files)
+- `cli/` (46 files)
+- `concepts/` (27 files)
+- `debug/` (1 files)
+- `design/` (1 files)
+- `diagnostics/` (1 files)
+- `experiments/` (12 files)
+- `gateway/` (33 files)
+- `help/` (7 files)
+- `install/` (20 files)
+- `ja-JP/` (3 files)
+- `nodes/` (9 files)
+- `platforms/` (27 files)
+- `plugins/` (5 files)
+- `providers/` (29 files)
+- `refactor/` (5 files)
+- `reference/` (26 files)
+- `security/` (4 files)
+- `start/` (14 files)
+- `tools/` (28 files)
+- `web/` (5 files)
+- `zh-CN/` (310 files)
 
 ## Query Patterns
 
-Run filename-first discovery when possible:
+Filename-first:
 
 ```bash
-rg --files openclaw_docs | rg 'install|gateway|telegram|approvals|security'
+rg --files openclaw_docs | rg 'gateway|install|telegram|security|models'
 ```
 
-Then run content search in narrowed paths:
+Content search after narrowing paths:
 
 ```bash
-rg -n "heartbeat|auth|permission|model failover" openclaw_docs/gateway openclaw_docs/concepts
+rg -n "auth|pairing|approval|health|provider" openclaw_docs/gateway openclaw_docs/cli openclaw_docs/channels
 ```
 
 ## Guardrails
 
-- Prefer stable docs over experiments unless the user asks for plans/proposals.
-- Read the full relevant file before answering behavior/defaults.
-- If no direct documentation is found, say that explicitly and list searched paths.
+- Prefer stable docs over experiments unless the user asks for proposals.
+- Read the full relevant file before answering defaults, behavior, or constraints.
+- If direct documentation is missing, say what you searched and that the gap is in the local snapshot.
