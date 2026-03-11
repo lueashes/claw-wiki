@@ -1,5 +1,5 @@
 ---
-name: openclaw_reference
+name: openclaw-reference
 description: Reference and refresh a local OpenClaw documentation snapshot for product usage, deployment, configuration, CLI commands, channels, gateway behavior, tools, troubleshooting, and docs-version verification. Use when users ask how OpenClaw works, how to configure or operate it, where a feature is documented, whether the local docs are outdated, or to update this skill's OpenClaw knowledge base from upstream docs.
 metadata:
   short-description: Reference and refresh OpenClaw docs
