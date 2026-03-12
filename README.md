@@ -1,17 +1,17 @@
 # Claw Wiki
 
-`claw-wiki` is a Codex skill repository that keeps a local, searchable snapshot of the OpenClaw documentation.
+`claw-wiki` is an OpenClaw skill repository that keeps a local, searchable snapshot of the OpenClaw documentation.
 
 It is designed for two jobs:
 
 - Answer OpenClaw questions from checked-in docs instead of model memory
 - Refresh that snapshot from the upstream OpenClaw repository in a repeatable way
 
-The repository combines a skill entrypoint (`SKILL.md`), a local docs corpus (`openclaw_docs/`), and maintenance scripts for syncing, validating, indexing, and diffing updates.
+The repository combines an OpenClaw skill entrypoint (`SKILL.md`), a local docs corpus (`openclaw_docs/`), and maintenance scripts for syncing, validating, indexing, and diffing updates.
 
 ## What is in this repo
 
-- `SKILL.md`: the Codex skill definition and lookup workflow
+- `SKILL.md`: the OpenClaw skill definition and lookup workflow
 - `openclaw_docs/`: the current local OpenClaw docs snapshot
 - `docs.json`: docs navigation metadata copied from upstream
 - `references/`: routing, query, and update helpers used by the skill
@@ -20,23 +20,29 @@ The repository combines a skill entrypoint (`SKILL.md`), a local docs corpus (`o
 
 ## Typical use cases
 
-- You want a local OpenClaw reference corpus that Codex can cite by file path
+- You want a local OpenClaw reference corpus that OpenClaw can load and cite by file path
 - You want deterministic answers based on a pinned docs snapshot
 - You want to check whether your local OpenClaw docs are stale
 - You want to pull the latest upstream docs and generate a change summary
 
-## Install as a Codex skill
+## Install as an OpenClaw skill
 
-If you use Codex skills from a local skills directory, clone or copy this repo into your skills folder and make sure the folder contains `SKILL.md`.
+OpenClaw can load skills from your workspace `./skills` directory or from `~/.openclaw/skills`. Clone or copy this repo into one of those locations and keep the folder name as `claw-wiki`.
 
 Example:
 
 ```bash
 git clone https://github.com/lueashes/claw-wiki.git
-cp -R claw-wiki ~/.codex/skills/claw-wiki
+cp -R claw-wiki ~/.openclaw/skills/claw-wiki
 ```
 
-After that, Codex can use the skill when the task is clearly about OpenClaw docs lookup or docs refresh.
+Workspace-local installation is also valid:
+
+```bash
+git clone https://github.com/lueashes/claw-wiki.git ./skills/claw-wiki
+```
+
+After that, OpenClaw can load the skill when the task is clearly about OpenClaw docs lookup or docs refresh.
 
 ## How the skill works
 
@@ -138,7 +144,7 @@ The maintenance scripts use only the Python standard library.
 - The checked-in snapshot currently targets the English OpenClaw docs set
 - Generated files under `state/` should be rebuilt after every sync
 - Validation should pass before you claim a refresh succeeded
-- This repo is intended for local reference and maintenance workflows, not for pushing changes back into the upstream OpenClaw docs repo
+- This repo is intended for OpenClaw-local reference and maintenance workflows, not for pushing changes back into the upstream OpenClaw docs repo
 
 ## Related files
 
