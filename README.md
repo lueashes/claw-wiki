@@ -1,0 +1,148 @@
+# Claw Wiki
+
+`claw-wiki` is a Codex skill repository that keeps a local, searchable snapshot of the OpenClaw documentation.
+
+It is designed for two jobs:
+
+- Answer OpenClaw questions from checked-in docs instead of model memory
+- Refresh that snapshot from the upstream OpenClaw repository in a repeatable way
+
+The repository combines a skill entrypoint (`SKILL.md`), a local docs corpus (`openclaw_docs/`), and maintenance scripts for syncing, validating, indexing, and diffing updates.
+
+## What is in this repo
+
+- `SKILL.md`: the Codex skill definition and lookup workflow
+- `openclaw_docs/`: the current local OpenClaw docs snapshot
+- `docs.json`: docs navigation metadata copied from upstream
+- `references/`: routing, query, and update helpers used by the skill
+- `scripts/`: sync and validation utilities
+- `state/`: generated metadata about the current snapshot
+
+## Typical use cases
+
+- You want a local OpenClaw reference corpus that Codex can cite by file path
+- You want deterministic answers based on a pinned docs snapshot
+- You want to check whether your local OpenClaw docs are stale
+- You want to pull the latest upstream docs and generate a change summary
+
+## Install as a Codex skill
+
+If you use Codex skills from a local skills directory, clone or copy this repo into your skills folder and make sure the folder contains `SKILL.md`.
+
+Example:
+
+```bash
+git clone https://github.com/lueashes/claw-wiki.git
+cp -R claw-wiki ~/.codex/skills/claw-wiki
+```
+
+After that, Codex can use the skill when the task is clearly about OpenClaw docs lookup or docs refresh.
+
+## How the skill works
+
+The skill answers questions from local files under `openclaw_docs/`, then cites exact paths used to produce the answer.
+
+The normal lookup flow is:
+
+1. Route the question to likely docs areas with `references/routing-cheatsheet.md`
+2. Narrow candidates with `rg --files` or `rg -n`
+3. Read the top relevant docs files in full
+4. Answer with explicit file-path citations
+
+For freshness-sensitive questions, the skill also reads:
+
+- `state/source-lock.json` for the upstream source, ref, commit, and sync timestamp
+- `state/latest-diff.md` for the last snapshot diff summary
+
+## Repository layout
+
+```text
+claw-wiki/
+├── SKILL.md
+├── README.md
+├── docs.json
+├── openclaw_docs/
+├── references/
+│   ├── query-examples.md
+│   ├── routing-cheatsheet.md
+│   └── update-workflow.md
+├── scripts/
+│   ├── build_knowledge.py
+│   ├── diff_docs.py
+│   ├── sync_docs.py
+│   └── validate_docs.py
+└── state/
+    ├── docs-manifest.json
+    ├── latest-diff.md
+    ├── source-lock.json
+    └── topic-index.json
+```
+
+## Refresh the OpenClaw docs snapshot
+
+This repo is meant to mirror the upstream OpenClaw docs into `openclaw_docs/`.
+
+### Option 1: Sync from a local OpenClaw checkout
+
+Use this when you already have the upstream repo on disk.
+
+```bash
+python scripts/sync_docs.py --source-path ../openclaw --mode pinned
+python scripts/validate_docs.py
+python scripts/build_knowledge.py
+python scripts/diff_docs.py
+```
+
+### Option 2: Sync from GitHub
+
+Use this when you want to refresh directly from upstream.
+
+```bash
+python scripts/sync_docs.py --repo-url https://github.com/openclaw/openclaw --ref main --mode tracking
+python scripts/validate_docs.py
+python scripts/build_knowledge.py
+python scripts/diff_docs.py
+```
+
+## What the maintenance scripts do
+
+- `scripts/sync_docs.py`: copies docs and `docs.json` from upstream into this repo and records snapshot metadata
+- `scripts/validate_docs.py`: checks that required doc areas exist and `docs.json` does not reference missing pages
+- `scripts/build_knowledge.py`: builds `state/docs-manifest.json`, `state/topic-index.json`, and a generated routing cheatsheet
+- `scripts/diff_docs.py`: compares the previous and current manifests and writes `state/latest-diff.md`
+
+## Snapshot metadata
+
+The current snapshot state is tracked in committed files under `state/`.
+
+The most important one is `state/source-lock.json`, which records:
+
+- upstream repository URL
+- tracked ref
+- resolved upstream commit
+- sync timestamp
+- whether the snapshot came from a local repo or a fresh clone
+
+This makes it possible to answer version-sensitive questions without guessing.
+
+## Requirements
+
+- Python 3.10+ is sufficient for the included scripts
+- `git` is required for remote sync mode
+- `rg` is recommended for fast lookup during interactive use
+
+The maintenance scripts use only the Python standard library.
+
+## Usage notes
+
+- The checked-in snapshot currently targets the English OpenClaw docs set
+- Generated files under `state/` should be rebuilt after every sync
+- Validation should pass before you claim a refresh succeeded
+- This repo is intended for local reference and maintenance workflows, not for pushing changes back into the upstream OpenClaw docs repo
+
+## Related files
+
+- [`SKILL.md`](./SKILL.md)
+- [`references/update-workflow.md`](./references/update-workflow.md)
+- [`state/source-lock.json`](./state/source-lock.json)
+- [`state/latest-diff.md`](./state/latest-diff.md)
