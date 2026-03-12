@@ -9,6 +9,8 @@ It is designed for two jobs:
 
 The repository combines an OpenClaw skill entrypoint (`SKILL.md`), a local docs corpus (`openclaw_docs/`), and maintenance scripts for syncing, validating, indexing, and diffing updates.
 
+In practice, this repo works best as an OpenClaw knowledge skill that you install into a workspace or shared skill directory, then let OpenClaw load into sessions when documentation lookup or docs maintenance is needed.
+
 ## What is in this repo
 
 - `SKILL.md`: the OpenClaw skill definition and lookup workflow
@@ -43,6 +45,19 @@ git clone https://github.com/lueashes/claw-wiki.git ./skills/claw-wiki
 ```
 
 After that, OpenClaw can load the skill when the task is clearly about OpenClaw docs lookup or docs refresh.
+
+## How it fits into OpenClaw
+
+OpenClaw skill precedence is:
+
+`<workspace>/skills` -> `~/.openclaw/skills` -> bundled skills
+
+That makes `claw-wiki` useful in two common modes:
+
+- Workspace skill: keep it inside one project or one OpenClaw agent workspace
+- Shared skill: install once in `~/.openclaw/skills` and reuse it across agents on the same machine
+
+If you later want to distribute it more broadly, this repo also matches the normal OpenClaw skill bundle structure used by ClawHub.
 
 ## How the skill works
 
@@ -145,6 +160,15 @@ The maintenance scripts use only the Python standard library.
 - Generated files under `state/` should be rebuilt after every sync
 - Validation should pass before you claim a refresh succeeded
 - This repo is intended for OpenClaw-local reference and maintenance workflows, not for pushing changes back into the upstream OpenClaw docs repo
+
+## ClawHub positioning
+
+This repository is structured so it can function as:
+
+- a directly cloned OpenClaw skill in `./skills` or `~/.openclaw/skills`
+- a future ClawHub-published skill bundle for OpenClaw users
+
+If you publish it through ClawHub later, the core behavior should stay the same: OpenClaw loads `SKILL.md`, uses the bundled docs snapshot, and relies on the included scripts to refresh and validate the knowledge base.
 
 ## Related files
 
