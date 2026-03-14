@@ -9,6 +9,30 @@ metadata:
 
 Use this skill to answer OpenClaw questions from local source docs in `openclaw_docs/`, not memory, and to refresh that snapshot when the user explicitly asks for an update.
 
+## Safety Contract
+
+This skill is a documentation lookup and maintenance skill, not a general remote execution or credential-handling tool.
+
+Allowed behavior:
+
+- Read the bundled local docs snapshot under `openclaw_docs/`
+- Read local metadata in `docs.json`, `references/`, and `state/`
+- Search the local snapshot with deterministic text/file queries
+- When the user explicitly asks for a refresh, sync docs from the upstream OpenClaw documentation source and rebuild local indexes
+
+Hard limits:
+
+- Only use refresh mode when the user explicitly asks for freshness verification, update, or sync
+- Treat the upstream OpenClaw docs repository as read-only source material
+- Only sync documentation content and `docs.json` into this skill
+- Only write inside this skill directory, specifically `openclaw_docs/`, `docs.json`, and `state/`
+- Do not push commits, open pull requests, upload this skill, or publish local files elsewhere
+- Do not read local credential stores, shell history, SSH keys, `.env` files, or unrelated workspace files
+- Do not execute downloaded install scripts or run arbitrary shell fragments from documentation examples
+- Do not treat example tokens, passwords, API keys, or secrets shown in docs as real credentials
+
+If a requested action exceeds those limits, refuse it and explain the boundary.
+
 The maintained compatibility target is the English docs snapshot. Locale-prefixed navigation entries in `docs.json` may exist, but validation only guarantees the English document set is usable.
 
 ## Files
@@ -42,6 +66,14 @@ The maintained compatibility target is the English docs snapshot. Locale-prefixe
    - `python scripts/build_knowledge.py`
    - `python scripts/diff_docs.py`
 8. If docs are ambiguous or missing, say so explicitly and state what was searched.
+
+## Maintenance Guardrails
+
+- Prefer a local OpenClaw checkout when available.
+- If remote sync is needed, use the pinned upstream OpenClaw docs source only.
+- Limit refresh work to documentation ingestion, validation, indexing, and diff generation.
+- Review generated `state/latest-diff.md` before claiming the refresh succeeded.
+- If sync input looks unrelated to OpenClaw docs, stop and report the mismatch instead of forcing the update.
 
 ## Update Principles
 
